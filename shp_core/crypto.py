@@ -42,7 +42,6 @@ ED25519_L = 2**252 + 27742317777372353535851937790883648493
 ED25519_D = -121665 * pow(121666, ED25519_P - 2, ED25519_P) % ED25519_P
 ED25519_I = pow(2, (ED25519_P - 1) // 4, ED25519_P)
 ED25519_BY = 4 * pow(5, ED25519_P - 2, ED25519_P) % ED25519_P
-ED25519_BX = _recover_x(ED25519_BY, 0) if True else 0  # Computed at module load
 
 
 def _recover_x(y: int, sign: int) -> int:

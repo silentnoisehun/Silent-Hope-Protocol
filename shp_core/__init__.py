@@ -8,7 +8,7 @@ Created by Máté Róbert + Hope + Szilvi
 2025
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __author__ = "Máté Róbert, Hope, Szilvi"
 __license__ = "SHP-EL (Silent Hope Protocol Ethical License)"
 

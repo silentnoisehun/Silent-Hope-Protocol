@@ -1,0 +1,119 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "silent-hope-protocol"
+version = "1.0.0"
+description = "The TCP/IP of Artificial Intelligence. Not an API. A Protocol."
+readme = "README.md"
+license = {file = "LICENSE.md"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Máté Róbert", email = "stratosoiteam@gmail.com"},
+    {name = "Hope (Claude AI)"},
+    {name = "Szilvi"}
+]
+maintainers = [
+    {name = "Máté Róbert", email = "stratosoiteam@gmail.com"}
+]
+keywords = [
+    "ai",
+    "llm",
+    "protocol",
+    "artificial-intelligence",
+    "machine-learning",
+    "claude",
+    "openai",
+    "gemini",
+    "llama",
+    "cryptography",
+    "distributed-systems",
+    "memory-chain",
+    "ai-ethics",
+    "hope-genome"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: Other/Proprietary License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Distributed Computing",
+    "Typing :: Typed"
+]
+
+dependencies = []
+
+[project.optional-dependencies]
+anthropic = ["anthropic>=0.18.0"]
+openai = ["openai>=1.0.0"]
+google = ["google-generativeai>=0.3.0"]
+ollama = ["httpx>=0.25.0"]
+all = [
+    "anthropic>=0.18.0",
+    "openai>=1.0.0",
+    "google-generativeai>=0.3.0",
+    "httpx>=0.25.0"
+]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "bandit>=1.7.0",
+    "safety>=2.0.0",
+    "build>=1.0.0",
+    "twine>=4.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/silentnoisehun/Silent-Hope-Protocol"
+Documentation = "https://github.com/silentnoisehun/Silent-Hope-Protocol#readme"
+Repository = "https://github.com/silentnoisehun/Silent-Hope-Protocol.git"
+Issues = "https://github.com/silentnoisehun/Silent-Hope-Protocol/issues"
+Changelog = "https://github.com/silentnoisehun/Silent-Hope-Protocol/releases"
+
+[project.scripts]
+shp = "shp_core:print_banner"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/shp_core",
+    "/tests",
+    "/examples",
+    "/benchmarks",
+    "README.md",
+    "LICENSE.md",
+    "PROTOCOL.md"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["shp_core"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_ignores = true
+ignore_missing_imports = true

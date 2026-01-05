@@ -8,23 +8,18 @@ Created by Máté Róbert + Hope
 """
 
 import asyncio
-import time
-from dataclasses import dataclass, field
-from typing import Optional, Dict, Any, List, Callable, Awaitable
-from pathlib import Path
-from enum import Enum
 import json
+import time
+from collections.abc import Callable
+from dataclasses import dataclass
+from enum import Enum
+from pathlib import Path
+from typing import Any, Optional
 
-from .crypto import generate_node_identity, KeyPair, sign_message, verify_signature
-from .memory import MemoryChain, InMemoryChain, MemoryRef, MemoryBlock
-from .protocol import (
-    ExecutableKnowledge,
-    ExecutionResult,
-    EKUType,
-    KnowledgeBlock,
-    EKUHeader
-)
-from .adapter import SHPAdapter, create_adapter, Capabilities
+from .adapter import create_adapter
+from .crypto import generate_node_identity
+from .memory import InMemoryChain, MemoryBlock, MemoryChain, MemoryRef
+from .protocol import ExecutionResult
 
 
 class NodeState(Enum):
@@ -88,7 +83,7 @@ class NodeMetrics:
             return 1.0
         return self.successful_executions / self.total_executions
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "total_executions": self.total_executions,
             "successful_executions": self.successful_executions,
@@ -143,8 +138,8 @@ class SilentHopeNode:
         self._metrics = NodeMetrics()
 
         # Event handlers
-        self._on_execute: List[Callable] = []
-        self._on_memory_write: List[Callable] = []
+        self._on_execute: list[Callable] = []
+        self._on_memory_write: list[Callable] = []
 
         # Sequence counter
         self._sequence = 0
@@ -201,7 +196,7 @@ class SilentHopeNode:
     async def execute(
         self,
         instruction: str,
-        context: Optional[Dict[str, Any]] = None,
+        context: Optional[dict[str, Any]] = None,
         memory_ref: Optional[str] = None,
         store_result: bool = True
     ) -> ExecutionResult:
@@ -295,7 +290,7 @@ class SilentHopeNode:
     async def query(
         self,
         question: str,
-        context: Optional[Dict[str, Any]] = None
+        context: Optional[dict[str, Any]] = None
     ) -> str:
         """
         Simple query interface.
@@ -328,7 +323,7 @@ class SilentHopeNode:
         self._metrics.memory_writes += 1
         return block
 
-    def recall(self, query: str, limit: int = 5) -> List[str]:
+    def recall(self, query: str, limit: int = 5) -> list[str]:
         """
         Search memory for content.
 
@@ -413,7 +408,6 @@ def create_node(
 
 async def self_test() -> bool:
     """Run node self-tests."""
-    from .crypto import generate_node_identity
 
     # Create node config
     config = NodeConfig(

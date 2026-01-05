@@ -9,16 +9,13 @@ Created by Máté Róbert + Hope
 
 import asyncio
 import time
-import random
-from dataclasses import dataclass, field
-from typing import Optional, Dict, List, Set, Callable, Any
+from collections.abc import Callable
+from dataclasses import dataclass
 from enum import Enum
-import json
+from typing import Any, Optional
 
-from .node import SilentHopeNode, NodeConfig, NodeCapabilities, NodeState
-from .memory import MemoryChain, MemoryBlock, MemoryRef
-from .protocol import ExecutableKnowledge, ExecutionResult, EKUType
-from .crypto import sha3_256
+from .node import NodeCapabilities, NodeState, SilentHopeNode
+from .protocol import ExecutionResult
 
 
 class NetworkState(Enum):
@@ -52,7 +49,7 @@ class NetworkMetrics:
     network_uptime_seconds: float = 0.0
     messages_routed: int = 0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "total_nodes": self.total_nodes,
             "active_nodes": self.active_nodes,
@@ -95,16 +92,16 @@ class SHPNetwork:
         self._start_time = time.time()
 
         # Node registry
-        self._nodes: Dict[str, SilentHopeNode] = {}
-        self._peers: Dict[str, PeerInfo] = {}
+        self._nodes: dict[str, SilentHopeNode] = {}
+        self._peers: dict[str, PeerInfo] = {}
 
         # Event handlers
-        self._on_node_join: List[Callable] = []
-        self._on_node_leave: List[Callable] = []
-        self._on_execution: List[Callable] = []
+        self._on_node_join: list[Callable] = []
+        self._on_node_leave: list[Callable] = []
+        self._on_execution: list[Callable] = []
 
         # Background tasks
-        self._tasks: List[asyncio.Task] = []
+        self._tasks: list[asyncio.Task] = []
 
         # Metrics
         self._metrics = NetworkMetrics()
@@ -198,18 +195,18 @@ class SHPNetwork:
         """Get a node by ID."""
         return self._nodes.get(node_id)
 
-    def get_nodes(self) -> List[SilentHopeNode]:
+    def get_nodes(self) -> list[SilentHopeNode]:
         """Get all nodes."""
         return list(self._nodes.values())
 
-    def get_peers(self) -> List[PeerInfo]:
+    def get_peers(self) -> list[PeerInfo]:
         """Get all peer information."""
         return list(self._peers.values())
 
     async def execute(
         self,
         instruction: str,
-        context: Optional[Dict[str, Any]] = None,
+        context: Optional[dict[str, Any]] = None,
         target_node: Optional[str] = None,
         broadcast: bool = False
     ) -> ExecutionResult:
@@ -334,15 +331,15 @@ class SHPNetwork:
             self._state = NetworkState.RUNNING
             return True
 
-        except Exception as e:
+        except Exception:
             self._state = NetworkState.DEGRADED
             return False
 
     async def broadcast(
         self,
         message: str,
-        exclude: Optional[Set[str]] = None
-    ) -> Dict[str, bool]:
+        exclude: Optional[set[str]] = None
+    ) -> dict[str, bool]:
         """
         Broadcast a message to all nodes.
 
@@ -373,7 +370,7 @@ class SHPNetwork:
         self,
         query: str,
         limit: int = 10
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Search across all nodes' memories.
 

@@ -10,10 +10,7 @@ Created by Máté Róbert + Hope
 import hashlib
 import secrets
 import struct
-import time
 from dataclasses import dataclass
-from typing import Tuple, Optional, Union
-from enum import IntEnum
 
 
 class CryptoError(Exception):

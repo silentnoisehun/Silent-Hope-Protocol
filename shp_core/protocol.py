@@ -7,12 +7,12 @@ Communication IS execution. No parsing. No rebuilding.
 Created by Máté Róbert + Hope
 """
 
+import json
 import struct
 import time
 from dataclasses import dataclass, field
-from typing import Optional, Dict, Any, List
 from enum import IntEnum, IntFlag
-import json
+from typing import Any, Optional
 
 from .crypto import sha3_256, sign_message, verify_signature
 
@@ -98,9 +98,9 @@ class EKUHeader:
 class KnowledgeBlock:
     """Executable knowledge content."""
     instruction: str
-    context: Dict[str, Any] = field(default_factory=dict)
-    parameters: Dict[str, Any] = field(default_factory=dict)
-    constraints: List[str] = field(default_factory=list)
+    context: dict[str, Any] = field(default_factory=dict)
+    parameters: dict[str, Any] = field(default_factory=dict)
+    constraints: list[str] = field(default_factory=list)
 
     def to_bytes(self) -> bytes:
         """Serialize to bytes."""
@@ -179,8 +179,10 @@ class ExecutableKnowledge:
 
     def sign(self, private_key: bytes) -> None:
         """Sign the EKU."""
-        header_bytes = self.header.to_bytes()
         knowledge_bytes = self.knowledge.to_bytes()
+        # Update payload_length BEFORE signing so it's consistent
+        self.header.payload_length = len(knowledge_bytes) + len(self.proof) + 4
+        header_bytes = self.header.to_bytes()
         message = sha3_256(header_bytes + knowledge_bytes + self.proof)
         self.signature = sign_message(private_key, message)
 
@@ -196,7 +198,7 @@ class ExecutableKnowledge:
         cls,
         instruction: str,
         sender_id: bytes,
-        context: Optional[Dict[str, Any]] = None,
+        context: Optional[dict[str, Any]] = None,
         memory_ref: Optional[bytes] = None
     ) -> "ExecutableKnowledge":
         """Create a QUERY type EKU."""
@@ -216,8 +218,8 @@ class ExecutableKnowledge:
         cls,
         instruction: str,
         sender_id: bytes,
-        parameters: Optional[Dict[str, Any]] = None,
-        constraints: Optional[List[str]] = None,
+        parameters: Optional[dict[str, Any]] = None,
+        constraints: Optional[list[str]] = None,
         memory_ref: Optional[bytes] = None
     ) -> "ExecutableKnowledge":
         """Create an EXECUTE type EKU."""
@@ -239,7 +241,7 @@ class ExecutableKnowledge:
         result: str,
         sender_id: bytes,
         in_response_to: int,
-        context: Optional[Dict[str, Any]] = None
+        context: Optional[dict[str, Any]] = None
     ) -> "ExecutableKnowledge":
         """Create a RESPONSE type EKU."""
         header = EKUHeader(
@@ -260,10 +262,10 @@ class ExecutionResult:
     success: bool
     output: str
     execution_time_ms: float
-    memory_refs: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    memory_refs: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "success": self.success,

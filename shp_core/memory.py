@@ -7,24 +7,16 @@ The network never forgets. Context is never rebuilt.
 Created by Máté Róbert + Hope
 """
 
-import json
-import struct
-import time
-import threading
-from dataclasses import dataclass, field
-from typing import Optional, List, Dict, Any, Iterator
-from pathlib import Path
-from enum import IntEnum
 import sqlite3
+import struct
+import threading
+import time
+from collections.abc import Iterator
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Optional
 
-from .crypto import (
-    sha3_256,
-    compute_merkle_root,
-    hash_block,
-    sign_message,
-    verify_signature,
-    KeyPair
-)
+from .crypto import KeyPair, compute_merkle_root, hash_block, sha3_256, sign_message
 
 
 class MemoryError(Exception):
@@ -171,7 +163,7 @@ class MemoryBlock:
             block_hash=block_hash
         )
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "height": self.height,
@@ -209,7 +201,7 @@ class MemoryChain:
         self.storage_path = storage_path
         self.keypair = keypair
         self._lock = threading.RLock()
-        self._cache: Dict[int, MemoryBlock] = {}
+        self._cache: dict[int, MemoryBlock] = {}
         self._height = 0
 
         if storage_path:
@@ -388,7 +380,7 @@ class MemoryChain:
             return None
         return self.get(self._height)
 
-    def resolve(self, ref: MemoryRef) -> List[MemoryBlock]:
+    def resolve(self, ref: MemoryRef) -> list[MemoryBlock]:
         """
         Resolve a memory reference to blocks.
 
@@ -451,7 +443,7 @@ class MemoryChain:
 
             return True
 
-    def search(self, query: str, limit: int = 10) -> List[MemoryBlock]:
+    def search(self, query: str, limit: int = 10) -> list[MemoryBlock]:
         """
         Search memory chain for content.
 
@@ -524,7 +516,7 @@ class InMemoryChain(MemoryChain):
     def __init__(self, keypair: Optional[KeyPair] = None):
         self.keypair = keypair
         self._lock = threading.RLock()
-        self._cache: Dict[int, MemoryBlock] = {}
+        self._cache: dict[int, MemoryBlock] = {}
         self._height = -1
         self._conn = None
 

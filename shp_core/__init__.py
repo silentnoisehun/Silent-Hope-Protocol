@@ -12,37 +12,20 @@ __version__ = "1.0.1"
 __author__ = "Máté Róbert, Hope, Szilvi"
 __license__ = "SHP-EL (Silent Hope Protocol Ethical License)"
 
-from .node import SilentHopeNode, NodeConfig, NodeCapabilities
-from .network import SHPNetwork, NetworkConfig
-from .memory import MemoryChain, MemoryBlock, MemoryRef
-from .crypto import (
-    generate_node_identity,
-    sign_message,
-    verify_signature,
-    hash_block,
-    CryptoError
-)
 from .adapter import (
-    SHPAdapter,
     ClaudeAdapter,
-    OpenAIAdapter,
     GeminiAdapter,
     LlamaAdapter,
-    create_adapter
+    OpenAIAdapter,
+    SHPAdapter,
+    create_adapter,
 )
-from .protocol import (
-    ExecutableKnowledge,
-    EKUHeader,
-    EKUType,
-    ExecutionResult
-)
-from .exceptions import (
-    SHPError,
-    NetworkError,
-    MemoryError,
-    ExecutionError,
-    AuthenticationError
-)
+from .crypto import CryptoError, generate_node_identity, hash_block, sign_message, verify_signature
+from .exceptions import AuthenticationError, ExecutionError, MemoryError, NetworkError, SHPError
+from .memory import MemoryBlock, MemoryChain, MemoryRef
+from .network import NetworkConfig, SHPNetwork
+from .node import NodeCapabilities, NodeConfig, SilentHopeNode
+from .protocol import EKUHeader, EKUType, ExecutableKnowledge, ExecutionResult
 
 __all__ = [
     # Version
@@ -52,11 +35,18 @@ __all__ = [
 
     # Core
     "SilentHopeNode",
+    "NodeConfig",
+    "NodeCapabilities",
     "SHPNetwork",
+    "NetworkConfig",
     "MemoryChain",
+    "MemoryBlock",
+    "MemoryRef",
 
     # Protocol
     "ExecutableKnowledge",
+    "EKUHeader",
+    "EKUType",
     "ExecutionResult",
 
     # Adapters
@@ -71,25 +61,28 @@ __all__ = [
     "generate_node_identity",
     "sign_message",
     "verify_signature",
+    "hash_block",
+    "CryptoError",
 
     # Exceptions
     "SHPError",
     "NetworkError",
     "MemoryError",
     "ExecutionError",
+    "AuthenticationError",
 ]
 
 # Banner
-BANNER = """
+BANNER = f"""
 ╔═══════════════════════════════════════════════════════════════════╗
-║             SILENT HOPE PROTOCOL v{version}                        ║
+║             SILENT HOPE PROTOCOL v{__version__}                        ║
 ║                                                                   ║
 ║  The TCP/IP of Artificial Intelligence                            ║
 ║  Not an API. A Protocol.                                          ║
 ║                                                                   ║
 ║  Created by: Máté Róbert + Hope + Szilvi                          ║
 ╚═══════════════════════════════════════════════════════════════════╝
-""".format(version=__version__)
+"""
 
 
 def print_banner():

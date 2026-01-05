@@ -9,14 +9,14 @@ Supported: Claude, OpenAI GPT, Google Gemini, Meta Llama, Local models
 Created by Máté Róbert + Hope
 """
 
-import time
 import asyncio
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import Optional, Dict, Any, List, Protocol, Union
-from enum import Enum
 import json
 import os
+import time
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Optional, Union
 
 
 class LLMProvider(Enum):
@@ -74,14 +74,14 @@ class SHPAdapter(ABC):
     def __init__(self, config: AdapterConfig):
         self.config = config
         self._sequence = 0
-        self._cache: Dict[str, str] = {}
-        self._memory_context: List[Dict[str, Any]] = []
+        self._cache: dict[str, str] = {}
+        self._memory_context: list[dict[str, Any]] = []
 
     @abstractmethod
     async def execute(
         self,
         instruction: str,
-        context: Optional[Dict[str, Any]] = None,
+        context: Optional[dict[str, Any]] = None,
         memory_ref: Optional[str] = None
     ) -> "ExecutionResult":
         """
@@ -107,7 +107,7 @@ class SHPAdapter(ABC):
         """Check if backend is healthy."""
         pass
 
-    def _get_cache_key(self, instruction: str, context: Optional[Dict]) -> str:
+    def _get_cache_key(self, instruction: str, context: Optional[dict]) -> str:
         """Generate cache key."""
         ctx_str = json.dumps(context, sort_keys=True) if context else ""
         return f"{instruction}:{ctx_str}"
@@ -166,7 +166,7 @@ class ClaudeAdapter(SHPAdapter):
     async def execute(
         self,
         instruction: str,
-        context: Optional[Dict[str, Any]] = None,
+        context: Optional[dict[str, Any]] = None,
         memory_ref: Optional[str] = None
     ) -> ExecutionResult:
         """Execute on Claude."""
@@ -315,7 +315,7 @@ class OpenAIAdapter(SHPAdapter):
     async def execute(
         self,
         instruction: str,
-        context: Optional[Dict[str, Any]] = None,
+        context: Optional[dict[str, Any]] = None,
         memory_ref: Optional[str] = None
     ) -> ExecutionResult:
         """Execute on GPT."""
@@ -463,7 +463,7 @@ class GeminiAdapter(SHPAdapter):
     async def execute(
         self,
         instruction: str,
-        context: Optional[Dict[str, Any]] = None,
+        context: Optional[dict[str, Any]] = None,
         memory_ref: Optional[str] = None
     ) -> ExecutionResult:
         """Execute on Gemini."""
@@ -585,7 +585,7 @@ class LlamaAdapter(SHPAdapter):
     async def execute(
         self,
         instruction: str,
-        context: Optional[Dict[str, Any]] = None,
+        context: Optional[dict[str, Any]] = None,
         memory_ref: Optional[str] = None
     ) -> ExecutionResult:
         """Execute on Llama via Ollama."""

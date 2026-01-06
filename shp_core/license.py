@@ -50,35 +50,31 @@ _trial_start: Optional[float] = None
 
 def _check_hope_genome_installed() -> bool:
     """Check if Hope Genome is installed."""
-    try:
-        import hope_genome
-        return True
-    except ImportError:
-        pass
+    import importlib.util
 
-    try:
-        import hope_core
+    if importlib.util.find_spec("hope_genome") is not None:
         return True
-    except ImportError:
-        pass
+
+    if importlib.util.find_spec("hope_core") is not None:
+        return True
 
     return False
 
 
 def _check_hope_genome_active() -> bool:
     """Check if Hope Genome watchdog is actively protecting."""
-    try:
-        from hope_genome import Watchdog, get_watchdog
-        watchdog = get_watchdog()
-        return watchdog is not None
-    except Exception:
-        pass
+    import importlib.util
 
-    try:
-        from hope_core import Watchdog
+    if importlib.util.find_spec("hope_genome") is not None:
+        try:
+            from hope_genome import get_watchdog  # noqa: F401
+            watchdog = get_watchdog()
+            return watchdog is not None
+        except Exception:
+            pass
+
+    if importlib.util.find_spec("hope_core") is not None:
         return True
-    except Exception:
-        pass
 
     return False
 
@@ -115,7 +111,7 @@ def _get_trial_start() -> float:
 
     if os.path.exists(trial_file):
         try:
-            with open(trial_file, "r") as f:
+            with open(trial_file) as f:
                 _trial_start = float(f.read().strip())
                 return _trial_start
         except Exception:

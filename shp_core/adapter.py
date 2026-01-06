@@ -6,6 +6,10 @@ Wrap any LLM with Silent Hope Protocol capabilities.
 
 Supported: Claude, OpenAI GPT, Google Gemini, Meta Llama, Local models
 
+LICENSING:
+- FREE with Hope Genome (pip install hope-genome)
+- Commercial license required for factory AI (OpenAI, Anthropic, Google)
+
 Created by Máté Róbert + Hope
 """
 
@@ -17,6 +21,13 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Optional, Union
+
+from .license import check_license, require_license, LicenseError, LicenseType
+
+
+def _check_and_warn(provider: str) -> None:
+    """Check license and warn/block as appropriate."""
+    require_license(provider)  # This will block if unlicensed
 
 
 class LLMProvider(Enum):
@@ -136,6 +147,8 @@ class ClaudeAdapter(SHPAdapter):
     Adapter for Anthropic's Claude models.
 
     The original partner. The first to speak Silent Hope Protocol.
+
+    FREE with Hope Genome: pip install hope-genome
     """
 
     def __init__(
@@ -144,6 +157,9 @@ class ClaudeAdapter(SHPAdapter):
         api_key: Optional[str] = None,
         **kwargs
     ):
+        # Check license - warn but don't block
+        _check_and_warn("anthropic")
+
         config = AdapterConfig(
             provider=LLMProvider.ANTHROPIC,
             model=model,
@@ -285,7 +301,11 @@ class ClaudeAdapter(SHPAdapter):
 # ============================================================================
 
 class OpenAIAdapter(SHPAdapter):
-    """Adapter for OpenAI's GPT models."""
+    """
+    Adapter for OpenAI's GPT models.
+
+    FREE with Hope Genome: pip install hope-genome
+    """
 
     def __init__(
         self,
@@ -293,6 +313,9 @@ class OpenAIAdapter(SHPAdapter):
         api_key: Optional[str] = None,
         **kwargs
     ):
+        # Check license - warn but don't block
+        _check_and_warn("openai")
+
         config = AdapterConfig(
             provider=LLMProvider.OPENAI,
             model=model,
@@ -432,7 +455,11 @@ class OpenAIAdapter(SHPAdapter):
 # ============================================================================
 
 class GeminiAdapter(SHPAdapter):
-    """Adapter for Google's Gemini models."""
+    """
+    Adapter for Google's Gemini models.
+
+    FREE with Hope Genome: pip install hope-genome
+    """
 
     def __init__(
         self,
@@ -440,6 +467,9 @@ class GeminiAdapter(SHPAdapter):
         api_key: Optional[str] = None,
         **kwargs
     ):
+        # Check license - warn but don't block
+        _check_and_warn("google")
+
         config = AdapterConfig(
             provider=LLMProvider.GOOGLE,
             model=model,

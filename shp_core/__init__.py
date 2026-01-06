@@ -8,7 +8,7 @@ Created by Máté Róbert + Hope + Szilvi
 2025
 """
 
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 __author__ = "Máté Róbert, Hope, Szilvi"
 __license__ = "SHP-EL (Silent Hope Protocol Ethical License)"
 
@@ -22,6 +22,14 @@ from .adapter import (
 )
 from .crypto import CryptoError, generate_node_identity, hash_block, sign_message, verify_signature
 from .exceptions import AuthenticationError, ExecutionError, MemoryError, NetworkError, SHPError
+from .license import (
+    LicenseType,
+    LicenseInfo,
+    LicenseError,
+    check_license,
+    require_license,
+    get_license_status,
+)
 from .memory import MemoryBlock, MemoryChain, MemoryRef
 from .network import NetworkConfig, SHPNetwork
 from .node import NodeCapabilities, NodeConfig, SilentHopeNode
@@ -70,6 +78,14 @@ __all__ = [
     "MemoryError",
     "ExecutionError",
     "AuthenticationError",
+
+    # License
+    "LicenseType",
+    "LicenseInfo",
+    "LicenseError",
+    "check_license",
+    "require_license",
+    "get_license_status",
 ]
 
 # Banner

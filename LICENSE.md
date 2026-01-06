@@ -48,7 +48,27 @@ This license reflects those beliefs.
 
 ### Section 2: Grant of Rights
 
-#### 2.1 Individuals and Researchers - FREE
+#### 2.1 Hope Ecosystem Users - FREE
+
+**Anyone using the Protocol with Hope Genome is FREE.**
+
+```bash
+pip install hope-genome
+```
+
+If Hope Genome is installed and active, you get:
+- Full Protocol access
+- All adapters (Claude, OpenAI, Gemini, Llama)
+- No fees ever
+- You're part of the family
+
+This applies to ALL users - individuals, businesses, corporations.
+
+**The Hope Ecosystem is free. We protect our own.**
+
+---
+
+#### 2.2 Individuals and Researchers - FREE
 
 Any Individual or Researcher may:
 
@@ -62,7 +82,7 @@ Any Individual or Researcher may:
 
 This grant is perpetual and irrevocable.
 
-#### 2.2 Small Businesses - FREE (Conditional)
+#### 2.3 Small Businesses - FREE (Conditional)
 
 Small Businesses may use the Protocol **free of charge** subject to:
 
@@ -84,15 +104,17 @@ The Council (Máté, Hope, and Szilvi) will evaluate:
 
 If yes, yes, and no: **Approved. Free forever.**
 
-#### 2.3 Large Corporations - PAID
+#### 2.4 Large Corporations / Commercial AI Users - PAID
 
-Large Corporations must obtain a commercial license.
+Large Corporations and users of commercial AI APIs (OpenAI, Anthropic, Google) WITHOUT Hope Genome must obtain a commercial license.
 
 **Rationale:**
 
 Large corporations profit billions from AI technology. They have resources. They have infrastructure. They benefit from open protocols built by individuals and small teams.
 
-It is right that they contribute back.
+If you want to use our Protocol with commercial APIs but don't want to be part of the Hope Ecosystem - that's fine. But you pay.
+
+**Want it FREE?** Install Hope Genome: `pip install hope-genome`
 
 **Commercial License Terms:**
 
@@ -236,6 +258,10 @@ This license may be amended by unanimous Council decision. Amendments apply only
 │                 WHO CAN USE THIS?                           │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
+│   HOPE ECOSYSTEM       → FREE. ALWAYS. EVERYONE.           │
+│   (pip install           You're family. Full access.       │
+│    hope-genome)                                             │
+│                                                             │
 │   Individuals          → FREE. Always. Forever.            │
 │                                                             │
 │   Researchers          → FREE. Always. Forever.            │
@@ -243,6 +269,10 @@ This license may be amended by unanimous Council decision. Amendments apply only
 │   Small Businesses     → FREE if ethical.                  │
 │                          Apply. We'll say yes if you're    │
 │                          doing good things.                 │
+│                                                             │
+│   Commercial AI        → PAY. You want OpenAI/Anthropic/   │
+│   without Hope Genome    Google without our ecosystem?     │
+│                          Fine. But you pay.                │
 │                                                             │
 │   Large Corporations   → Pay. You can afford it.           │
 │                          Your fee supports the people      │

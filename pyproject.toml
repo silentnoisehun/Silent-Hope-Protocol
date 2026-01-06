@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "silent-hope-protocol"
-version = "1.0.1"
+version = "1.1.0"
 description = "The TCP/IP of Artificial Intelligence. Not an API. A Protocol."
 readme = "README.md"
 license = {file = "LICENSE.md"}

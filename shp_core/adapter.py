@@ -22,7 +22,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Optional, Union
 
-from .license import check_license, require_license, LicenseError, LicenseType
+from .license import require_license
 
 
 def _check_and_warn(provider: str) -> None:

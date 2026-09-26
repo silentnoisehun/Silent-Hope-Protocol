@@ -1,3 +1,7 @@
+<!-- badges:start -->
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22983077.svg)](https://doi.org/10.5281/zenodo.22983077)
+[![ORCID iD](https://img.shields.io/badge/ORCID-0009--0003--3986--6039-green)](https://orcid.org/0009-0003-3986-6039)
+<!-- badges:end -->
 # Silent Hope Protocol
 
 <div align="center">

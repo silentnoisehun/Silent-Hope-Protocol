@@ -49,7 +49,9 @@ classifiers = [
     "Typing :: Typed"
 ]
 
-dependencies = []
+dependencies = [
+    "cryptography>=41.0.0"
+]
 
 [project.optional-dependencies]
 anthropic = ["anthropic>=0.18.0"]
@@ -81,7 +83,7 @@ Issues = "https://github.com/silentnoisehun/Silent-Hope-Protocol/issues"
 Changelog = "https://github.com/silentnoisehun/Silent-Hope-Protocol/releases"
 
 [project.scripts]
-shp = "shp_core:print_banner"
+shp = "shp_core.cli:main"
 
 [tool.hatch.build.targets.sdist]
 include = [

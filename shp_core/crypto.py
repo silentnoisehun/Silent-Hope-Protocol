@@ -11,6 +11,7 @@ import hashlib
 import secrets
 import struct
 from dataclasses import dataclass
+from typing import Optional, cast
 
 
 class CryptoError(Exception):
@@ -41,7 +42,7 @@ ED25519_I = pow(2, (ED25519_P - 1) // 4, ED25519_P)
 ED25519_BY = 4 * pow(5, ED25519_P - 2, ED25519_P) % ED25519_P
 
 
-def _recover_x(y: int, sign: int) -> int:
+def _recover_x(y: int, sign: int) -> Optional[int]:
     """Recover x coordinate from y coordinate on Ed25519 curve."""
     if y >= ED25519_P:
         return None
@@ -69,7 +70,9 @@ def _recover_x(y: int, sign: int) -> int:
 
 
 # Recompute ED25519_BX properly
-ED25519_BX = _recover_x(ED25519_BY, 0)
+_bx = _recover_x(ED25519_BY, 0)
+assert _bx is not None
+ED25519_BX: int = _bx
 ED25519_B = (ED25519_BX, ED25519_BY, 1, ED25519_BX * ED25519_BY % ED25519_P)
 
 
@@ -116,7 +119,7 @@ def _point_compress(P) -> bytes:
     x = x * zi % ED25519_P
     y = y * zi % ED25519_P
 
-    return (y | ((x & 1) << 255)).to_bytes(32, 'little')
+    return cast(bytes, (y | ((x & 1) << 255)).to_bytes(32, 'little'))
 
 
 def _point_decompress(s: bytes) -> tuple:
@@ -149,6 +152,39 @@ def _clamp(k: bytes) -> int:
     return int.from_bytes(bytes(k_list), 'little')
 
 
+# Precompute 4-bit window table for base point B (pure Python acceleration)
+_B_TABLE = []
+_P_curr = ED25519_B
+for _ in range(64):
+    _row = [(0, 1, 1, 0)]
+    _curr = _P_curr
+    for _ in range(1, 16):
+        _row.append(_curr)
+        _curr = _point_add(_curr, _P_curr)
+    _B_TABLE.append(_row)
+    for _ in range(4):
+        _P_curr = _point_add(_P_curr, _P_curr)
+
+
+def _base_scalar_mult(s: int) -> tuple:
+    """Fast scalar multiplication for base point ED25519_B using precomputed 4-bit table."""
+    Q = (0, 1, 1, 0)
+    for i in range(64):
+        nibble = (s >> (4 * i)) & 0xF
+        if nibble:
+            Q = _point_add(Q, _B_TABLE[i][nibble])
+    return Q
+
+
+try:
+    from cryptography.hazmat.primitives.asymmetric import ed25519 as _crypto_ed25519
+    from cryptography.hazmat.primitives import serialization as _serialization
+    from cryptography.exceptions import InvalidSignature as _InvalidSignature
+    _HAS_CRYPTOGRAPHY = True
+except ImportError:
+    _HAS_CRYPTOGRAPHY = False
+
+
 # ============================================================================
 # Public API
 # ============================================================================
@@ -171,21 +207,22 @@ def generate_node_identity() -> KeyPair:
     Returns:
         KeyPair with public key, private key, and derived node ID
     """
-    # Generate 32 random bytes for private key seed
     seed = secrets.token_bytes(32)
 
-    # Hash to get private key
-    h = _sha512(seed)
-    a = _clamp(h[:32])
+    if _HAS_CRYPTOGRAPHY:
+        priv_obj = _crypto_ed25519.Ed25519PrivateKey.from_private_bytes(seed)
+        public_key = priv_obj.public_key().public_bytes(
+            _serialization.Encoding.Raw,
+            _serialization.PublicFormat.Raw
+        )
+        private_key = seed + public_key
+    else:
+        h = _sha512(seed)
+        a = _clamp(h[:32])
+        A = _base_scalar_mult(a)
+        public_key = _point_compress(A)
+        private_key = seed + public_key
 
-    # Compute public key
-    A = _scalar_mult(a, ED25519_B)
-    public_key = _point_compress(A)
-
-    # Private key is seed || public key (64 bytes total)
-    private_key = seed + public_key
-
-    # Node ID is first 16 bytes of SHA3-256(public_key)
     node_id = sha3_256(public_key)[:16]
 
     return KeyPair(
@@ -210,23 +247,21 @@ def sign_message(private_key: bytes, message: bytes) -> bytes:
         raise CryptoError("Private key must be 64 bytes")
 
     seed = private_key[:32]
-    public_key = private_key[32:]
 
+    if _HAS_CRYPTOGRAPHY:
+        priv_obj = _crypto_ed25519.Ed25519PrivateKey.from_private_bytes(seed)
+        return cast(bytes, priv_obj.sign(message))
+
+    public_key = private_key[32:]
     h = _sha512(seed)
     a = _clamp(h[:32])
     prefix = h[32:]
 
-    # r = H(prefix || message)
     r = int.from_bytes(_sha512(prefix + message), 'little') % ED25519_L
-
-    # R = r * B
-    R = _scalar_mult(r, ED25519_B)
+    R = _base_scalar_mult(r)
     R_bytes = _point_compress(R)
 
-    # k = H(R || A || message)
     k = int.from_bytes(_sha512(R_bytes + public_key + message), 'little') % ED25519_L
-
-    # s = r + k * a
     s = (r + k * a) % ED25519_L
 
     return R_bytes + s.to_bytes(32, 'little')
@@ -249,6 +284,14 @@ def verify_signature(public_key: bytes, message: bytes, signature: bytes) -> boo
     if len(signature) != 64:
         raise CryptoError("Signature must be 64 bytes")
 
+    if _HAS_CRYPTOGRAPHY:
+        try:
+            pub_obj = _crypto_ed25519.Ed25519PublicKey.from_public_bytes(public_key)
+            pub_obj.verify(signature, message)
+            return True
+        except Exception:
+            return False
+
     try:
         A = _point_decompress(public_key)
         R_bytes = signature[:32]
@@ -258,15 +301,12 @@ def verify_signature(public_key: bytes, message: bytes, signature: bytes) -> boo
         if s >= ED25519_L:
             return False
 
-        # k = H(R || A || message)
         k = int.from_bytes(_sha512(R_bytes + public_key + message), 'little') % ED25519_L
 
-        # Check: s * B == R + k * A
-        sB = _scalar_mult(s, ED25519_B)
+        sB = _base_scalar_mult(s)
         kA = _scalar_mult(k, A)
         RkA = _point_add(R, kA)
 
-        # Compare in extended coordinates
         return (_point_compress(sB) == _point_compress(RkA))
     except Exception:
         return False

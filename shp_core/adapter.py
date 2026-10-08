@@ -549,8 +549,8 @@ class GeminiAdapter(SHPAdapter):
                 output=output,
                 metrics=ExecutionMetrics(
                     latency_ms=elapsed_ms,
-                    tokens_input=len(full_prompt.split()) * 1.3,  # Estimate
-                    tokens_output=len(output.split()) * 1.3,
+                    tokens_input=int(len(full_prompt.split()) * 1.3),  # Estimate
+                    tokens_output=int(len(output.split()) * 1.3),
                     cache_hit=False,
                     memory_refs_resolved=1 if memory_ref else 0
                 )
@@ -719,7 +719,7 @@ class LlamaAdapter(SHPAdapter):
             import httpx
             async with httpx.AsyncClient() as client:
                 response = await client.get(f"{self.config.base_url}/api/tags")
-                return response.status_code == 200
+                return bool(response.status_code == 200)
         except Exception:
             return False
 
@@ -751,7 +751,17 @@ def create_adapter(
         result = await adapter.execute("Hello, Hope!")
     """
     if isinstance(provider, str):
-        provider = LLMProvider(provider.lower())
+        p_str = provider.lower()
+        if p_str in ("claude", "anthropic"):
+            provider = LLMProvider.ANTHROPIC
+        elif p_str in ("gpt", "openai"):
+            provider = LLMProvider.OPENAI
+        elif p_str in ("gemini", "google"):
+            provider = LLMProvider.GOOGLE
+        elif p_str in ("llama", "ollama", "local", "meta"):
+            provider = LLMProvider.OLLAMA
+        else:
+            provider = LLMProvider(p_str)
 
     if provider == LLMProvider.ANTHROPIC:
         return ClaudeAdapter(

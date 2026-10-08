@@ -32,10 +32,13 @@ from .license import (
 )
 from .memory import MemoryBlock, MemoryChain, MemoryRef
 from .network import NetworkConfig, SHPNetwork
+from .cli import main as cli_main
 from .node import NodeCapabilities, NodeConfig, SilentHopeNode
 from .protocol import EKUHeader, EKUType, ExecutableKnowledge, ExecutionResult
 
 __all__ = [
+    # CLI
+    "cli_main",
     # Version
     "__version__",
     "__author__",

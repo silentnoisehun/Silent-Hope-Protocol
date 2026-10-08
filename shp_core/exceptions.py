@@ -6,6 +6,8 @@ All protocol-specific exceptions.
 Created by Máté Róbert + Hope
 """
 
+from typing import Optional
+
 
 class SHPError(Exception):
     """Base exception for Silent Hope Protocol errors."""
@@ -19,7 +21,7 @@ class SHPError(Exception):
 class NetworkError(SHPError):
     """Network-related errors."""
 
-    def __init__(self, message: str, node_id: str = None):
+    def __init__(self, message: str, node_id: Optional[str] = None):
         super().__init__(message, code=0x0007)
         self.node_id = node_id
 
@@ -27,7 +29,7 @@ class NetworkError(SHPError):
 class MemoryError(SHPError):
     """Memory chain errors."""
 
-    def __init__(self, message: str, block_height: int = None):
+    def __init__(self, message: str, block_height: Optional[int] = None):
         super().__init__(message, code=0x0003)
         self.block_height = block_height
 
@@ -35,7 +37,7 @@ class MemoryError(SHPError):
 class ExecutionError(SHPError):
     """Execution errors."""
 
-    def __init__(self, message: str, instruction: str = None):
+    def __init__(self, message: str, instruction: Optional[str] = None):
         super().__init__(message, code=0x0004)
         self.instruction = instruction
 
@@ -43,7 +45,7 @@ class ExecutionError(SHPError):
 class AuthenticationError(SHPError):
     """Authentication/signature errors."""
 
-    def __init__(self, message: str, node_id: str = None):
+    def __init__(self, message: str, node_id: Optional[str] = None):
         super().__init__(message, code=0x0002)
         self.node_id = node_id
 
@@ -51,7 +53,7 @@ class AuthenticationError(SHPError):
 class TimeoutError(SHPError):
     """Operation timeout."""
 
-    def __init__(self, message: str, timeout_ms: int = None):
+    def __init__(self, message: str, timeout_ms: Optional[int] = None):
         super().__init__(message, code=0x0005)
         self.timeout_ms = timeout_ms
 
@@ -59,7 +61,7 @@ class TimeoutError(SHPError):
 class RateLimitError(SHPError):
     """Rate limit exceeded."""
 
-    def __init__(self, message: str, retry_after_ms: int = None):
+    def __init__(self, message: str, retry_after_ms: Optional[int] = None):
         super().__init__(message, code=0x0006)
         self.retry_after_ms = retry_after_ms
 
@@ -67,7 +69,7 @@ class RateLimitError(SHPError):
 class InvalidEKUError(SHPError):
     """Invalid Executable Knowledge Unit."""
 
-    def __init__(self, message: str, field: str = None):
+    def __init__(self, message: str, field: Optional[str] = None):
         super().__init__(message, code=0x0001)
         self.field = field
 
@@ -75,7 +77,7 @@ class InvalidEKUError(SHPError):
 class ChainIntegrityError(MemoryError):
     """Memory chain integrity violation."""
 
-    def __init__(self, message: str, expected_hash: bytes = None, actual_hash: bytes = None):
+    def __init__(self, message: str, expected_hash: Optional[bytes] = None, actual_hash: Optional[bytes] = None):
         super().__init__(message)
         self.expected_hash = expected_hash
         self.actual_hash = actual_hash
@@ -94,7 +96,7 @@ class BlockNotFoundError(MemoryError):
 class AdapterError(SHPError):
     """LLM adapter error."""
 
-    def __init__(self, message: str, provider: str = None):
+    def __init__(self, message: str, provider: Optional[str] = None):
         super().__init__(message)
         self.provider = provider
 

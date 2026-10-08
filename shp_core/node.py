@@ -232,24 +232,33 @@ class SilentHopeNode:
                     ]
 
             # Execute via adapter
-            result = await self._adapter.execute(
+            adapter_res = await self._adapter.execute(
                 instruction=instruction,
                 context=resolved_context,
                 memory_ref=memory_ref
             )
 
+            # Convert to protocol ExecutionResult
+            latency = adapter_res.metrics.latency_ms if adapter_res.metrics else 0.0
+            protocol_res = ExecutionResult(
+                success=adapter_res.success,
+                output=adapter_res.output,
+                execution_time_ms=latency,
+                metadata={"error": adapter_res.error} if adapter_res.error else {}
+            )
+
             # Update metrics
             self._metrics.total_executions += 1
-            self._metrics.total_latency_ms += result.metrics.latency_ms
+            self._metrics.total_latency_ms += latency
 
-            if result.success:
+            if adapter_res.success:
                 self._metrics.successful_executions += 1
 
                 # Store in memory if requested
                 if store_result:
                     content = json.dumps({
                         "instruction": instruction,
-                        "response": result.output,
+                        "response": adapter_res.output,
                         "timestamp": time.time()
                     }).encode('utf-8')
 
@@ -269,20 +278,20 @@ class SilentHopeNode:
             else:
                 self._metrics.failed_executions += 1
 
-            if result.metrics.cache_hit:
+            if adapter_res.metrics and adapter_res.metrics.cache_hit:
                 self._metrics.cache_hits += 1
 
             # Trigger handlers
             for handler in self._on_execute:
                 try:
                     if asyncio.iscoroutinefunction(handler):
-                        await handler(result)
+                        await handler(protocol_res)
                     else:
-                        handler(result)
+                        handler(protocol_res)
                 except Exception:
                     pass
 
-            return result
+            return protocol_res
 
         finally:
             self._state = NodeState.READY
@@ -307,7 +316,8 @@ class SilentHopeNode:
             context=context,
             store_result=False
         )
-        return result.output if result.success else f"Error: {result.error}"
+        err_msg = result.error or result.output or "Unknown error"
+        return result.output if result.success else f"Error: {err_msg}"
 
     def remember(self, content: str) -> MemoryBlock:
         """

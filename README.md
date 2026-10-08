@@ -79,11 +79,11 @@ Real tests. Real hardware. Real results.
 
 | Operation | Traditional API | Silent Hope Protocol | Speedup |
 |-----------|-----------------|---------------------|---------|
-| Simple query | 847ms | 12ms | **70x** |
-| Complex reasoning | 12.4s | 89ms | **139x** |
-| Multi-step task | 34.2s | 234ms | **146x** |
-| Context recall | 2.1s | 3ms | **700x** |
-| Batch (1000 queries) | 14m 23s | 8.7s | **99x** |
+| Simple query | 847ms | 12ms | **70.58x** |
+| Complex reasoning | 12.4s | 89ms | **139.33x** |
+| Multi-step task | 34.2s | 234ms | **146.15x** |
+| Context recall | 2.1s | 3ms | **700.00x** |
+| Batch (1000 queries) | 14m 23s | 8.7s | **99.20x** |
 
 ### Memory Efficiency
 
@@ -118,9 +118,9 @@ Real tests. Real hardware. Real results.
 Test: Process 1 billion tokens across distributed network
 Nodes: 100
 Duration: 4 hours 12 minutes
-Throughput: 66,137 tokens/second
+Throughput: 66,137.57 tokens/second
 Traditional estimate: 47 days
-Speedup: 268x
+Speedup: 268.57x
 ```
 
 ---

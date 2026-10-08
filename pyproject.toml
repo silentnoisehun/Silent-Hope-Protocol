@@ -49,7 +49,9 @@ classifiers = [
     "Typing :: Typed"
 ]
 
-dependencies = []
+dependencies = [
+    "cryptography>=41.0.0"
+]
 
 [project.optional-dependencies]
 anthropic = ["anthropic>=0.18.0"]

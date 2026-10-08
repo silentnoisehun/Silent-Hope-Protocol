@@ -102,7 +102,7 @@ Real tests. Real hardware. Real results.
 ║  Concurrent Connections:     10,000                              ║
 ║  Total Requests:             1,000,000                           ║
 ║  Duration:                   47.3 seconds                        ║
-║  Requests/Second:            21,141                              ║
+║  Requests/Second:            21,141.65                           ║
 ║  Average Latency:            4.7ms                               ║
 ║  P99 Latency:                23ms                                ║
 ║  Error Rate:                 0.000%                              ║

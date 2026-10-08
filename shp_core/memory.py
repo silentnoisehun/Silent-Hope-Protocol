@@ -395,7 +395,7 @@ class MemoryChain:
                 latest = self.get_latest()
                 return [latest] if latest else []
 
-            if ref.range_start is not None:
+            if ref.range_start is not None and ref.range_end is not None:
                 blocks = []
                 for h in range(ref.range_start, ref.range_end + 1):
                     try:
@@ -498,6 +498,8 @@ class MemoryChain:
         return self._height + 1
 
     def __iter__(self) -> Iterator[MemoryBlock]:
+        if self._height < 0:
+            return
         for h in range(0, self._height + 1):
             try:
                 yield self.get(h)
@@ -557,7 +559,8 @@ def self_test() -> bool:
     assert chain.get(2).content == b"Szilvi adds wisdom"
 
     # Test latest
-    assert chain.get_latest().height == 2
+    latest = chain.get_latest()
+    assert latest is not None and latest.height == 2
 
     # Test memory reference
     ref = MemoryRef.parse("chain:latest")

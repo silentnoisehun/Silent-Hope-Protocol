@@ -549,8 +549,8 @@ class GeminiAdapter(SHPAdapter):
                 output=output,
                 metrics=ExecutionMetrics(
                     latency_ms=elapsed_ms,
-                    tokens_input=len(full_prompt.split()) * 1.3,  # Estimate
-                    tokens_output=len(output.split()) * 1.3,
+                    tokens_input=int(len(full_prompt.split()) * 1.3),  # Estimate
+                    tokens_output=int(len(output.split()) * 1.3),
                     cache_hit=False,
                     memory_refs_resolved=1 if memory_ref else 0
                 )
@@ -719,7 +719,7 @@ class LlamaAdapter(SHPAdapter):
             import httpx
             async with httpx.AsyncClient() as client:
                 response = await client.get(f"{self.config.base_url}/api/tags")
-                return response.status_code == 200
+                return bool(response.status_code == 200)
         except Exception:
             return False
 

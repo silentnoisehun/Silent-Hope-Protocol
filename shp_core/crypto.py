@@ -11,6 +11,7 @@ import hashlib
 import secrets
 import struct
 from dataclasses import dataclass
+from typing import Optional, cast
 
 
 class CryptoError(Exception):
@@ -41,7 +42,7 @@ ED25519_I = pow(2, (ED25519_P - 1) // 4, ED25519_P)
 ED25519_BY = 4 * pow(5, ED25519_P - 2, ED25519_P) % ED25519_P
 
 
-def _recover_x(y: int, sign: int) -> int:
+def _recover_x(y: int, sign: int) -> Optional[int]:
     """Recover x coordinate from y coordinate on Ed25519 curve."""
     if y >= ED25519_P:
         return None
@@ -69,7 +70,9 @@ def _recover_x(y: int, sign: int) -> int:
 
 
 # Recompute ED25519_BX properly
-ED25519_BX = _recover_x(ED25519_BY, 0)
+_bx = _recover_x(ED25519_BY, 0)
+assert _bx is not None
+ED25519_BX: int = _bx
 ED25519_B = (ED25519_BX, ED25519_BY, 1, ED25519_BX * ED25519_BY % ED25519_P)
 
 
@@ -116,7 +119,7 @@ def _point_compress(P) -> bytes:
     x = x * zi % ED25519_P
     y = y * zi % ED25519_P
 
-    return (y | ((x & 1) << 255)).to_bytes(32, 'little')
+    return cast(bytes, (y | ((x & 1) << 255)).to_bytes(32, 'little'))
 
 
 def _point_decompress(s: bytes) -> tuple:
@@ -175,6 +178,7 @@ def _base_scalar_mult(s: int) -> tuple:
 
 try:
     from cryptography.hazmat.primitives.asymmetric import ed25519 as _crypto_ed25519
+    from cryptography.hazmat.primitives import serialization as _serialization
     from cryptography.exceptions import InvalidSignature as _InvalidSignature
     _HAS_CRYPTOGRAPHY = True
 except ImportError:
@@ -207,7 +211,10 @@ def generate_node_identity() -> KeyPair:
 
     if _HAS_CRYPTOGRAPHY:
         priv_obj = _crypto_ed25519.Ed25519PrivateKey.from_private_bytes(seed)
-        public_key = priv_obj.public_key().public_bytes_raw()
+        public_key = priv_obj.public_key().public_bytes(
+            _serialization.Encoding.Raw,
+            _serialization.PublicFormat.Raw
+        )
         private_key = seed + public_key
     else:
         h = _sha512(seed)
@@ -243,7 +250,7 @@ def sign_message(private_key: bytes, message: bytes) -> bytes:
 
     if _HAS_CRYPTOGRAPHY:
         priv_obj = _crypto_ed25519.Ed25519PrivateKey.from_private_bytes(seed)
-        return priv_obj.sign(message)
+        return cast(bytes, priv_obj.sign(message))
 
     public_key = private_key[32:]
     h = _sha512(seed)

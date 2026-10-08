@@ -66,7 +66,7 @@ def cmd_remember(text: str):
     node = create_node("cli-node", storage_path=storage_path)
     block = node.remember(text)
     node.shutdown()
-    print(f"[+] Memory stored successfully!")
+    print("[+] Memory stored successfully!")
     print(f"    Height: {block.height}")
     print(f"    Block Hash: {block.block_hash.hex()}")
     print(f"    Timestamp: {block.timestamp}")

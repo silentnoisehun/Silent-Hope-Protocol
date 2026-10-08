@@ -226,8 +226,8 @@ class SHPNetwork:
             return ExecutionResult(
                 success=False,
                 output="",
-                error="No nodes in network",
-                metrics=None
+                execution_time_ms=0.0,
+                metadata={"error": "No nodes in network"}
             )
 
         if broadcast:
@@ -250,8 +250,8 @@ class SHPNetwork:
                 return ExecutionResult(
                     success=False,
                     output="",
-                    error=f"Node {target_node} not found",
-                    metrics=None
+                    execution_time_ms=0.0,
+                    metadata={"error": f"Node {target_node} not found"}
                 )
             result = await node.execute(instruction, context)
             self._metrics.total_executions += 1

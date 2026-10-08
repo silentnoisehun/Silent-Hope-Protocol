@@ -37,7 +37,7 @@ def test_cli_version(capsys):
 
 def test_cli_remember_and_recall(capsys, tmp_path):
     """Test 'shp remember' and 'shp recall' commands."""
-    with patch("shp_core.node.Path.home", return_value=tmp_path):
+    with patch("shp_core.cli.Path.home", return_value=tmp_path):
         ret_rem = main(["remember", "Test memory string for CLI test"])
         assert ret_rem == 0
         cap_rem = capsys.readouterr()

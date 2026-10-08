@@ -265,6 +265,20 @@ class ExecutionResult:
     memory_refs: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
 
+    @property
+    def error(self) -> Optional[str]:
+        """Optional error message."""
+        return self.metadata.get("error") if self.metadata else None
+
+    @property
+    def metrics(self) -> Any:
+        """Adapter-compatible execution metrics object."""
+        from types import SimpleNamespace
+        return SimpleNamespace(
+            latency_ms=self.execution_time_ms,
+            cache_hit=bool(self.metadata.get("cache_hit", False)) if self.metadata else False
+        )
+
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
